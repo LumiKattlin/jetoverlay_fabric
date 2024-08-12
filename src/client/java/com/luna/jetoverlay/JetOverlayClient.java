@@ -3,6 +3,7 @@ package com.luna.jetoverlay;
 import com.luna.jetoverlay.client.JetOverlayHud;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.Minecraft;
 
 public class JetOverlayClient implements ClientModInitializer {
 	@Override

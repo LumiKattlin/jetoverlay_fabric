@@ -7,8 +7,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.NearestVisibleLivingEntities;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 import org.joml.Vector2i;
@@ -24,18 +28,23 @@ public class JetOverlayHud implements HudRenderCallback {
         int y;
         int x;
         Minecraft client = Minecraft.getInstance();
-        Camera camera = client.gameRenderer.getMainCamera();
-        List<Entity> entities =
+
         if (client != null) {
             int width = client.getWindow().getGuiScaledWidth();
             int height = client.getWindow().getGuiScaledHeight();
-            LocalPlayer player = Minecraft.getInstance().player;
             x = width / 2;
             y = height;
+            int range = 20;
+            BlockPos pos = Minecraft.getInstance().player.blockPosition();
 
-            if(shouldDraw)  {
-
-            }
+            LocalPlayer player = Minecraft.getInstance().player;;
+            var worldIn = Minecraft.getInstance().level;
+            List<LivingEntity> entities = worldIn.getNearbyEntities(LivingEntity.class,
+                    TargetingConditions.DEFAULT,
+                    player,
+                    new AABB(pos.subtract(new BlockPos(range, range, range)), pos.offset(new BlockPos(range, range, range)))
+            );
+            
 
         }
 
