@@ -8,6 +8,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.NearestVisibleLivingEntities;
@@ -44,8 +45,18 @@ public class JetOverlayHud implements HudRenderCallback {
                     player,
                     new AABB(pos.subtract(new BlockPos(range, range, range)), pos.offset(new BlockPos(range, range, range)))
             );
-            
 
+            for (var entity : entities) {
+                Vec3 entityPos = entity.position();
+                Vector3d entityPosVector3 = new Vector3d(entityPos.x(), entityPos.y, entityPos.z);
+                Vector2i entityPosition =  toScreenPosition(entityPosVector3, player);
+                Vector2i screenHalfSize = new Vector2i(
+                        Minecraft.getInstance().getWindow().getHeight(),
+                        Minecraft.getInstance().getWindow().getHeight()).div(2);
+                if (isScreenPositionVisible(entityPosition)) {
+                    drawContext.drawString(Minecraft.getInstance().font, String.valueOf(entity.getHealth()), entityPosition.x + screenHalfSize.x, entityPosition.y + screenHalfSize.y, 0);
+                }
+            }
         }
 
     }
