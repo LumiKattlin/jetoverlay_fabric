@@ -56,21 +56,20 @@ public class RenderUtils {
         Minecraft client = Minecraft.getInstance();
         MultiBufferSource.BufferSource bufferSource = client.renderBuffers().bufferSource();
 
-            System.out.println(renderInfo.rotation().x + " " + renderInfo.rotation().y + " " + renderInfo.rotation().z + " " + renderInfo.rotation().w);
-            float size = 0.04f;
-            stack.pushPose();
+        System.out.println(renderInfo.rotation().x + " " + renderInfo.rotation().y + " " + renderInfo.rotation().z + " " + renderInfo.rotation().w);
+        float size = 0.04f;
+        stack.pushPose();
 
-            stack.translate(-renderInfo.getPosition().x + entity.position().x, -renderInfo.getPosition().y + entity.position().y + entity.getBbHeight() * 1.5, -renderInfo.getPosition().z + entity.position().z);
-            stack.mulPoseMatrix(new Matrix4f().rotation(renderInfo.rotation().invert()));
-            stack.scale(-size, -size, -size);
-            float dunnosize = -client.font.width(text) / 2f;
-            client.font.drawInBatch(text, dunnosize, 0, 0xFFDF5050, true,
-                    stack.last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL,
-                    0, 100);
-            stack.popPose();
-            Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
-
-
+        stack.translate(-renderInfo.getPosition().x + entity.position().x, -renderInfo.getPosition().y + entity.position().y + entity.getBbHeight() * 1.5, -renderInfo.getPosition().z + entity.position().z);
+        stack.mulPoseMatrix(new Matrix4f().rotation(renderInfo.rotation().invert()));
+        stack.scale(-size, -size, -size);
+        float dunnosize = -client.font.width(text) / 2f;
+        client.font.drawInBatch(text, dunnosize, 0, 0xFFDF5050, true,
+                stack.last().pose(), Minecraft.getInstance().renderBuffers().bufferSource(), Font.DisplayMode.NORMAL,
+                0, 100);
+        stack.popPose();
+        Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
 
 
+    }
 }
