@@ -3,6 +3,7 @@ package com.luna.jetoverlay.utils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.renderer.v1.Renderer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -17,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 
+import javax.swing.*;
 import java.util.List;
 
 public class RenderUtils {
@@ -69,7 +71,7 @@ public class RenderUtils {
                 0, 100);
         stack.popPose();
         Minecraft.getInstance().renderBuffers().bufferSource().endBatch();
-
+        context.world();
 
     }
 }

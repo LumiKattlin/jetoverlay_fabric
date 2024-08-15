@@ -1,10 +1,19 @@
 package com.luna.jetoverlay.client;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +25,7 @@ import java.util.List;
 public class JetOverlayHud implements HudRenderCallback {
 	boolean shouldDraw = false;
 
-	protected void drawTextAt(String text, Vector3f worldPosition, GuiGraphics drawContext) {
+	protected void drawTextAt(String text, Vector3f worldPosition, GuiGraphics drawContext, LivingEntity entity) {
 		Minecraft mc = Minecraft.getInstance();
 		// Matrix math shamelessly stolen from here:
 		// https://github.com/Klemmbaustein/Klemmgine/blob/f5454be1e95c43cbb91f0f55abf682774572defe/EngineSource/Objects/Components/CameraComponent.cpp#L36-L43
@@ -70,7 +79,7 @@ public class JetOverlayHud implements HudRenderCallback {
 		);
 
 		for (var entity : entities) {
-			drawTextAt("Health: " + entity.getHealth(), entity.position().toVector3f().add(0, 2.5f, 0), drawContext);
+			drawTextAt("Health: " + entity.getHealth(), entity.position().toVector3f().add(0, 2.5f, 0), drawContext, entity);
 		}
     }
 }
