@@ -1,5 +1,6 @@
 package com.luna.jetoverlay;
 
+import com.luna.jetoverlay.client.HudOverlay;
 import com.luna.jetoverlay.client.JetOverlayHud;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -24,6 +25,8 @@ import net.minecraft.world.entity.PlayerRideable;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
@@ -42,12 +45,21 @@ public class JetOverlayClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new JetOverlayHud());
+		HudRenderCallback.EVENT.register(new HudOverlay());
 		KeyBindingHelper.registerKeyBinding(toggle_outline);
 		ClientTickEvents.END_CLIENT_TICK.register((yippe) -> {
 			if(toggle_outline.consumeClick()) {
 				shouldRenderOutline = !shouldRenderOutline;
 			}
 		});
+//		WorldRenderEvents.END.register((whatever) -> {
+//			HitResult hit = Minecraft.getInstance().player.pick(25, 5, true);
+//			switch (hit.getType()) {
+//				case MISS, BLOCK, ENTITY:
+//					System.out.println(hit.getType());
+//					break;
+//			}
+//		});
 	}
 
 

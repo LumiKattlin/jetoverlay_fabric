@@ -1,5 +1,6 @@
 package com.luna.jetoverlay.client;
 
+import com.luna.jetoverlay.JetOverlayClient;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.Camera;
@@ -18,6 +19,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import org.joml.*;
 
 import java.util.List;
@@ -63,23 +66,26 @@ public class JetOverlayHud implements HudRenderCallback {
 
 	@Override
     public void onHudRender(GuiGraphics drawContext, float tickDelta) {
-		var worldIn = Minecraft.getInstance().level;
-		Player player = Minecraft.getInstance().player;
+		if (JetOverlayClient.shouldRenderOutline) {
+			var worldIn = Minecraft.getInstance().level;
+			Player player = Minecraft.getInstance().player;
 
-		if (worldIn == null || player == null) {
-			return;
+			if (worldIn == null || player == null) {
+				return;
+			}
+			int range = 25;
+			BlockPos pos = player.blockPosition();
+			List<LivingEntity> entities = worldIn.getNearbyEntities(LivingEntity.class,
+					TargetingConditions.DEFAULT,
+					player,
+					new AABB(pos.subtract(new BlockPos(range, range, range)), pos.offset(new BlockPos(range, range, range)))
+			);
+
+			for (var entity : entities) {
+				drawTextAt("Health: " + entity.getHealth(), entity.position().toVector3f().add(0, 2.5f, 0), drawContext, entity);
+			}
 		}
 
-		int range = 25;
-		BlockPos pos = player.blockPosition();
-		List<LivingEntity> entities = worldIn.getNearbyEntities(LivingEntity.class,
-				TargetingConditions.DEFAULT,
-				player,
-				new AABB(pos.subtract(new BlockPos(range, range, range)), pos.offset(new BlockPos(range, range, range)))
-		);
-
-		for (var entity : entities) {
-			drawTextAt("Health: " + entity.getHealth(), entity.position().toVector3f().add(0, 2.5f, 0), drawContext, entity);
-		}
     }
+
 }

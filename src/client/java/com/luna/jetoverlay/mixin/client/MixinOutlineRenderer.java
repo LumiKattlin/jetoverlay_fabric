@@ -37,7 +37,12 @@ public abstract class MixinOutlineRenderer {
 			int i = entity.getTeamColor();
 			outlineBufferSource.setColor(FastColor.ARGB32.red(i), FastColor.ARGB32.green(i), FastColor.ARGB32.blue(i), 1);
 			bufferSource = outlineBufferSource;
-
+			double d = Mth.lerp((double)partialTick, entity.xOld, entity.getX());
+			double e = Mth.lerp((double)partialTick, entity.yOld, entity.getY());
+			double f = Mth.lerp((double)partialTick, entity.zOld, entity.getZ());
+			float g = Mth.lerp(partialTick, entity.yRotO, entity.getYRot());
+			this.entityRenderDispatcher
+					.render(entity, d - camX, e - camY, f - camZ, g, partialTick, poseStack, bufferSource, this.entityRenderDispatcher.getPackedLightCoords(entity, partialTick));
 		}
 
 	}
