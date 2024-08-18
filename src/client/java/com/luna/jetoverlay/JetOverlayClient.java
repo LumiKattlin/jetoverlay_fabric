@@ -32,34 +32,36 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JetOverlayClient implements ClientModInitializer {
 	public static boolean shouldRenderOutline = false;
+	public static List<Integer> markedEntities = new ArrayList<>();
 	public static final KeyMapping toggle_outline = new KeyMapping("key.toggle-outline",
 			InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_LEFT_CONTROL,
-			"jetoverlay.enable-outline"
+			"jetoverlay"
 			);
-
+	public static final KeyMapping markEntityAsTarget = new KeyMapping("key.mark-entity-target",
+			InputConstants.Type.KEYSYM,
+			GLFW.GLFW_KEY_D,
+			"jetoverlay"
+			);
 	@Override
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new JetOverlayHud());
 		HudRenderCallback.EVENT.register(new HudOverlay());
 		KeyBindingHelper.registerKeyBinding(toggle_outline);
+		KeyBindingHelper.registerKeyBinding(markEntityAsTarget);
 		ClientTickEvents.END_CLIENT_TICK.register((yippe) -> {
 			if(toggle_outline.consumeClick()) {
 				shouldRenderOutline = !shouldRenderOutline;
 			}
 		});
-//		WorldRenderEvents.END.register((whatever) -> {
-//			HitResult hit = Minecraft.getInstance().player.pick(25, 5, true);
-//			switch (hit.getType()) {
-//				case MISS, BLOCK, ENTITY:
-//					System.out.println(hit.getType());
-//					break;
-//			}
-//		});
+		WorldRenderEvents.END.register((whatever) -> {
+
+		});
 	}
 
 

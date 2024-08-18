@@ -18,9 +18,11 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 
 import java.util.List;
@@ -59,9 +61,22 @@ public class JetOverlayHud implements HudRenderCallback {
 		// Convert to UI coordinates. So from -1 - 1 to 0 - width/height
 		int xPos = (int) (x * (windowWidth / 2.0f)) + windowWidth / 2;
 		int yPos = (int) (y * (windowHeight / 2.0f)) + windowHeight / 2;
+		Float _entityHealth = entity.getHealth();
+		Float _entityMaxHealth = entity.getMaxHealth();
+		Integer _entityHealthPercentage = (int)(_entityHealth / _entityMaxHealth) * 100;
+		String _entityHealthText = String.valueOf(_entityHealthPercentage) + "%";
+		xPos -= mc.font.width(_entityHealthText) / 2;
+		if (_entityHealthPercentage <= 100 && _entityHealthPercentage > 50 ) {
+			drawContext.drawString(mc.font, _entityHealthText, xPos, yPos, 0x00FF00);
+		}
+		else if(_entityHealthPercentage <= 50 && _entityHealthPercentage > 25) {
+			drawContext.drawString(mc.font, _entityHealthText, xPos, yPos, 0xFFAA00);
+		}
+		else {
+			drawContext.drawString(mc.font, _entityHealthText, xPos, yPos, 0xFF0000);
+		}
 
-		xPos -= mc.font.width(text) / 2;
-		drawContext.drawString(mc.font, text, xPos, yPos, 0xffffffff);
+
 	}
 
 	@Override
@@ -73,16 +88,33 @@ public class JetOverlayHud implements HudRenderCallback {
 			if (worldIn == null || player == null) {
 				return;
 			}
-			int range = 25;
+			int range = 30;
 			BlockPos pos = player.blockPosition();
 			List<LivingEntity> entities = worldIn.getNearbyEntities(LivingEntity.class,
 					TargetingConditions.DEFAULT,
 					player,
 					new AABB(pos.subtract(new BlockPos(range, range, range)), pos.offset(new BlockPos(range, range, range)))
 			);
+			Vec3 eyeposition = player.getEyePosition();
+			float raycastRange = 1000f;
+			Vec3 vec32 = player.getViewVector(1.0F);
+			Vec3 vec33 = eyeposition.add(vec32.x * raycastRange, vec32.y * raycastRange, vec32.z * raycastRange);
+			float f = 1.0F;
+			AABB aABB = player.getBoundingBox().expandTowards(vec32.scale(raycastRange)).inflate(raycastRange, raycastRange, raycastRange);
+			EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(player, eyeposition, vec33, aABB, (entityx) -> !entityx.isSpectator() && entityx != player, raycastRange);
+			if (entityHitResult != null) {
+				if(JetOverlayClient.markEntityAsTarget.consumeClick()) {
+					System.out.println(entityHitResult.getEntity().isCurrentlyGlowing());
 
+					if (JetOverlayClient.markedEntities.contains(entityHitResult.getEntity().getId())) JetOverlayClient.markedEntities.remove((Object)entityHitResult.getEntity().getId()); else JetOverlayClient.markedEntities.add(entityHitResult.getEntity().getId());
+				}
+			}
 			for (var entity : entities) {
-				drawTextAt("Health: " + entity.getHealth(), entity.position().toVector3f().add(0, 2.5f, 0), drawContext, entity);
+				if (JetOverlayClient.markedEntities.contains((Object)entity.getId())) {
+					drawTextAt("", entity.position().toVector3f().add(0, 2.5f, 0), drawContext, entity);
+				}
+
+
 			}
 		}
 
