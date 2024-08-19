@@ -162,6 +162,9 @@ public class JetOverlayHud implements HudRenderCallback {
 		}
 		return CameraRotationDirection.NOTHING;
 	}
+	public float ReturnRotationDifference(float __originalPos, float __newPos) {
+		return __newPos - __originalPos;
+	}
 	public float ReturnRedstonePower(float __difference) {
 		float _redstonePower = 0;
 		return _redstonePower;
