@@ -3,6 +3,7 @@ package com.luna.jetoverlay.client;
 import com.luna.jetoverlay.JetOverlayClient;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.loader.impl.util.log.Log;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -81,6 +82,14 @@ public class JetOverlayHud implements HudRenderCallback {
 
 	@Override
     public void onHudRender(GuiGraphics drawContext, float tickDelta) {
+		CameraRotationDirection rotationDirection = DetectCameraRotation(Minecraft.getInstance().gameRenderer.getMainCamera());
+		if (rotationDirection == CameraRotationDirection.LEFT || rotationDirection == CameraRotationDirection.RIGHT) {
+			drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0,10,0x00FF00);
+		}
+		if(rotationDirection == CameraRotationDirection.DOWN || rotationDirection == CameraRotationDirection.UP) {
+			drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0,20,0x00FF00);
+
+		}
 		if (JetOverlayClient.shouldRenderOutline) {
 			var worldIn = Minecraft.getInstance().level;
 			Player player = Minecraft.getInstance().player;
@@ -118,7 +127,43 @@ public class JetOverlayHud implements HudRenderCallback {
 
 			}
 		}
-
     }
+	float _originalXRot;
+	float _originalYRot ;
+	public CameraRotationDirection DetectCameraRotation(Camera __camera) {
+		//X axis decreases when going up, increases when going down
+		if(__camera.getXRot() != _originalXRot) {
+			if(__camera.getXRot() < _originalXRot) {
+				System.out.println("Camera going up");
+				_originalXRot = __camera.getXRot();
+				return CameraRotationDirection.UP;
 
+			}
+			else {
+				System.out.println("Camera going down");
+				_originalXRot = __camera.getXRot();
+				return CameraRotationDirection.DOWN;
+			}
+		}
+		//Y axis decreases when going to the left, increases when going to the right
+		if(__camera.getYRot() != _originalYRot) {
+			if(__camera.getYRot() < _originalYRot) {
+				System.out.println("Camera going to the left");
+				_originalYRot = __camera.getYRot();
+				return CameraRotationDirection.LEFT;
+			}
+			else {
+				System.out.println("Camera going to the right");
+				_originalYRot = __camera.getYRot();
+				return CameraRotationDirection.RIGHT;
+			}
+
+
+		}
+		return CameraRotationDirection.NOTHING;
+	}
+	public float ReturnRedstonePower(float __difference) {
+		float _redstonePower = 0;
+		return _redstonePower;
+	}
 }
