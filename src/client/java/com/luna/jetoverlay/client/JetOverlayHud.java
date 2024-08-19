@@ -112,6 +112,7 @@ public class JetOverlayHud implements HudRenderCallback {
 			for (var entity : entities) {
 				if (JetOverlayClient.markedEntities.contains((Object)entity.getId())) {
 					drawTextAt("", entity.position().toVector3f().add(0, 2.5f, 0), drawContext, entity);
+					drawContext.drawString(Minecraft.getInstance().font, "Targets: " + JetOverlayClient.markedEntities.toString(), 0, 2, 0x00FF00);
 				}
 
 
