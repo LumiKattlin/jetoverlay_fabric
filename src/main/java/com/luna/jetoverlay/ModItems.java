@@ -2,6 +2,7 @@ package com.luna.jetoverlay;
 
 import com.luna.jetoverlay.armor.JetGoggles;
 import com.luna.jetoverlay.blocks.RotationToRedstone;
+import com.luna.jetoverlay.blocks.RotationToRedstoneEntity;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
@@ -18,6 +19,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.intellij.lang.annotations.Identifier;
 

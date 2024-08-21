@@ -2,6 +2,7 @@ package com.luna.jetoverlay;
 
 import com.luna.jetoverlay.client.HudOverlay;
 import com.luna.jetoverlay.client.JetOverlayHud;
+import com.luna.jetoverlay.misc.EasingHUDUtils;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.ClientModInitializer;
@@ -27,14 +28,13 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.apache.commons.lang3.ClassUtils;
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.lwjgl.glfw.GLFW;
-
 import java.util.ArrayList;
 import java.util.List;
-
 public class JetOverlayClient implements ClientModInitializer {
 	public static boolean shouldRenderOutline = false;
 	public static List<Integer> markedEntities = new ArrayList<>();
@@ -48,6 +48,8 @@ public class JetOverlayClient implements ClientModInitializer {
 			GLFW.GLFW_KEY_D,
 			"jetoverlay"
 			);
+
+
 	@Override
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new JetOverlayHud());
@@ -62,6 +64,7 @@ public class JetOverlayClient implements ClientModInitializer {
 		WorldRenderEvents.END.register((whatever) -> {
 
 		});
+
 	}
 
 
