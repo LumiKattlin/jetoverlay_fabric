@@ -1,35 +1,38 @@
 package com.luna.jetoverlay.client;
 
 import com.luna.jetoverlay.JetOverlayClient;
+import com.luna.jetoverlay.armor.JetGoggles;
 import com.luna.jetoverlay.misc.EasingHUDUtils;
 import com.luna.jetoverlay.networking.PacketSender;
-import io.netty.buffer.ByteBuf;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 
-import javax.management.remote.rmi.RMIConnectionImpl_Stub;
-import java.lang.Math;
 import java.util.List;
 
 public class JetOverlayHud implements HudRenderCallback {
-	boolean shouldDraw = false;
 
-	protected void drawTextAt(String text, Vector3f worldPosition, GuiGraphics drawContext, LivingEntity entity) {
+	private final float _RAYCAST_RANGE = 1000f;
+	private final int _NEARBY_ENTITIES_RANGE = 30;
+
+	float _originalXRot;
+	float _originalYRot ;
+
+	protected void drawTextAt(String text, int color, Vector3f worldPosition, GuiGraphics drawContext, LivingEntity entity) {
 		Minecraft mc = Minecraft.getInstance();
 		// Matrix math shamelessly stolen from here:
 		// https://github.com/Klemmbaustein/Klemmgine/blob/f5454be1e95c43cbb91f0f55abf682774572defe/EngineSource/Objects/Components/CameraComponent.cpp#L36-L43
@@ -60,111 +63,114 @@ public class JetOverlayHud implements HudRenderCallback {
 		// Convert to UI coordinates. So from -1 - 1 to 0 - width/height
 		int xPos = (int) (x * (windowWidth / 2.0f)) + windowWidth / 2;
 		int yPos = (int) (y * (windowHeight / 2.0f)) + windowHeight / 2;
-		Float _entityHealth = entity.getHealth();
-		Float _entityMaxHealth = entity.getMaxHealth();
-		Integer _entityHealthPercentage = (int)(_entityHealth / _entityMaxHealth) * 100;
-		String _entityHealthText = String.valueOf(_entityHealthPercentage) + "%";
-		xPos -= mc.font.width(_entityHealthText) / 2;
-		if (_entityHealthPercentage <= 100 && _entityHealthPercentage > 50 ) {
-			drawContext.drawString(mc.font, _entityHealthText, xPos, yPos, 0x00FF00);
-		}
-		else if(_entityHealthPercentage <= 50 && _entityHealthPercentage > 25) {
-			drawContext.drawString(mc.font, _entityHealthText, xPos, yPos, 0xFFAA00);
-		}
-		else {
-			drawContext.drawString(mc.font, _entityHealthText, xPos, yPos, 0xFF0000);
-		}
-
-
+		xPos -= mc.font.width(text) / 2;
+		drawContext.drawString(mc.font, text, xPos, yPos, color);
 	}
-	EasingHUDUtils _easingUtils = new EasingHUDUtils();
-	double _start = 1;
-	double _duration = 100;
+
+	int colorFromHealthPercentage(int __percentage) {
+		if (__percentage > 66) {
+			return 0x00FF00;
+		}
+		if (__percentage > 33) {
+			return 0xFFFF00;
+		}
+		return 0xFF0000;
+	}
+
+	private void markEntityLogic(Player __player) {
+		Vec3 eyePosition = __player.getEyePosition();
+		Vec3 viewVector = __player.getViewVector(0);
+		Vec3 rayCastEnd = eyePosition.add(viewVector.multiply(_RAYCAST_RANGE, _RAYCAST_RANGE, _RAYCAST_RANGE));
+		AABB boundingBox = __player.getBoundingBox().expandTowards(viewVector.scale(_RAYCAST_RANGE)).inflate(_RAYCAST_RANGE, _RAYCAST_RANGE, _RAYCAST_RANGE);
+
+		EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(
+				__player, eyePosition, rayCastEnd, boundingBox,
+				(hitEntity) -> !hitEntity.isSpectator() && hitEntity != __player, _RAYCAST_RANGE);
+
+		if (entityHitResult != null && JetOverlayClient.markEntityAsTarget.consumeClick()) {
+			LivingEntity entity = (LivingEntity) entityHitResult.getEntity();
+			if (JetOverlayClient.markedEntities.contains(entity))
+				JetOverlayClient.markedEntities.remove(entity);
+			else
+				JetOverlayClient.markedEntities.add(entity);
+		}
+	}
+
+	private void renderOverlay(GuiGraphics __drawContext, float __tickDelta) {
+		ClientLevel world = Minecraft.getInstance().level;
+		Player player = Minecraft.getInstance().player;
+
+		if (world == null || player == null) {
+			return;
+		}
+
+		markEntityLogic(player);
+
+		for (var entity : JetOverlayClient.markedEntities) {
+			if (!entity.isAlive() || entity.distanceTo(player) > _NEARBY_ENTITIES_RANGE) {
+				JetOverlayClient.markedEntities.remove(entity);
+				break;
+			}
+
+			int entityHealthPercentage = (int) (entity.getHealth() / entity.getMaxHealth() * 100);
+			String entityHealthText = entityHealthPercentage + "%";
+			int color = colorFromHealthPercentage(entityHealthPercentage);
+
+			drawTextAt(entityHealthText, color, entity.position().toVector3f().add(0, 2.5f, 0), __drawContext, entity);
+		}
+
+		String blockPosString = "Not linked";
+		var headSlot = player.getItemBySlot(EquipmentSlot.HEAD);
+		if (!headSlot.isEmpty() && headSlot.hasTag() && headSlot.getTag().contains(JetGoggles.GOGGLES_BLOCK_TAG_NAME)) {
+			blockPosString = "Linked to: " + headSlot.getTag().get(JetGoggles.GOGGLES_BLOCK_TAG_NAME).getAsString();
+		}
+
+		__drawContext.drawString(Minecraft.getInstance().font, blockPosString, 0, 2, 0x00FF00);
+	}
+
 	@Override
-    public void onHudRender(GuiGraphics drawContext, float tickDelta) {
+    public void onHudRender(GuiGraphics __drawContext, float __tickDelta) {
 
-		CameraRotationDirection rotationDirection = DetectCameraRotation(Minecraft.getInstance().gameRenderer.getMainCamera());
+		CameraRotationDirection rotationDirection = detectCameraRotation(Minecraft.getInstance().gameRenderer.getMainCamera());
 		if (rotationDirection == CameraRotationDirection.LEFT || rotationDirection == CameraRotationDirection.RIGHT) {
-			drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0,10,0x00FF00);
+			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 10, 0x00FF00);
 		}
-		if(rotationDirection == CameraRotationDirection.DOWN || rotationDirection == CameraRotationDirection.UP) {
-			drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0,20,0x00FF00);
+		if (rotationDirection == CameraRotationDirection.DOWN || rotationDirection == CameraRotationDirection.UP) {
+			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 20, 0x00FF00);
+		}
 
-		}
 		if (JetOverlayClient.shouldRenderOutline) {
-			var worldIn = Minecraft.getInstance().level;
-			Player player = Minecraft.getInstance().player;
-
-			if (worldIn == null || player == null) {
-				return;
-			}
-			int range = 30;
-			BlockPos pos = player.blockPosition();
-			List<LivingEntity> entities = worldIn.getNearbyEntities(LivingEntity.class,
-					TargetingConditions.DEFAULT,
-					player,
-					new AABB(pos.subtract(new BlockPos(range, range, range)), pos.offset(new BlockPos(range, range, range)))
-			);
-			Vec3 _eyeposition = player.getEyePosition();
-			float _raycastRange = 1000f;
-			Vec3 vec32 = player.getViewVector(1.0F);
-			Vec3 vec33 = _eyeposition.add(vec32.x * _raycastRange, vec32.y * _raycastRange, vec32.z * _raycastRange);
-			float f = 1.0F;
-			AABB aABB = player.getBoundingBox().expandTowards(vec32.scale(_raycastRange)).inflate(_raycastRange, _raycastRange, _raycastRange);
-			EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(player, _eyeposition, vec33, aABB, (entityx) -> !entityx.isSpectator() && entityx != player, _raycastRange);
-			if (entityHitResult != null) {
-				if(JetOverlayClient.markEntityAsTarget.consumeClick()) {
-					System.out.println(entityHitResult.getEntity().isCurrentlyGlowing());
-
-					if (JetOverlayClient.markedEntities.contains(entityHitResult.getEntity().getId())) JetOverlayClient.markedEntities.remove((Object)entityHitResult.getEntity().getId()); else JetOverlayClient.markedEntities.add(entityHitResult.getEntity().getId());
-				}
-			}
-
-			for (var _entity : entities) {
-				if (JetOverlayClient.markedEntities.contains((Object) _entity.getId())) {
-					drawTextAt("", _entity.position().toVector3f().add(0, 2.5f, 0), drawContext, _entity);
-					drawContext.drawString(Minecraft.getInstance().font, "Targets: " + JetOverlayClient.markedEntities.toString(), 0, 2, 0x00FF00);
-
-				}
-
-
-			}
+			renderOverlay(__drawContext, __tickDelta);
 		}
-    }
-	float _originalXRot;
-	float _originalYRot ;
+	}
+
 	ResourceLocation _clientChannel = new ResourceLocation("jetoverlay_client", "redstone_emitter_client");
-	public CameraRotationDirection DetectCameraRotation(Camera __camera) {
+
+	public CameraRotationDirection detectCameraRotation(Camera __camera) {
 		//X axis decreases when going up, increases when going down
 
-		if(__camera.getXRot() != _originalXRot) {
-			if(__camera.getXRot() < _originalXRot) {
-				System.out.println("Camera going up");
+		if (__camera.getXRot() != _originalXRot) {
+			if (__camera.getXRot() < _originalXRot) {
 				_originalXRot = __camera.getXRot();
 				PacketSender.SendPacket("Yippe");
 				return CameraRotationDirection.UP;
 
 			}
 			else {
-				System.out.println("Camera going down");
 				_originalXRot = __camera.getXRot();
 				return CameraRotationDirection.DOWN;
 			}
 		}
 		//Y axis decreases when going to the left, increases when going to the right
-		if(__camera.getYRot() != _originalYRot) {
-			if(__camera.getYRot() < _originalYRot) {
-				System.out.println("Camera going to the left");
+		if (__camera.getYRot() != _originalYRot) {
+			if (__camera.getYRot() < _originalYRot) {
 				_originalYRot = __camera.getYRot();
 				return CameraRotationDirection.LEFT;
 			}
 			else {
-				System.out.println("Camera going to the right");
 				_originalYRot = __camera.getYRot();
 				return CameraRotationDirection.RIGHT;
 			}
-
-
 		}
 		return CameraRotationDirection.NOTHING;
 	}

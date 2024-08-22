@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,29 +34,35 @@ public abstract class MixinOutlineRenderer {
 
 	@Shadow private @Nullable PostChain entityEffect;
 
-	private Entity _trackedEntity;
+	private static int[] outlineColorFromHealthPercentage(float __healthFraction) {
+		if (__healthFraction > 0.66f) {
+			return new int[]{0, 0xFFFFFFFF, 0};
+		}
+		if (__healthFraction > 0.33f) {
+			return new int[]{0xFFFFFFFF, 0xFFFFFFFF, 0};
+		}
+		return new int[]{0xFFFFFFFF, 0, 0};
+	}
+
+	private LivingEntity _trackedEntity;
 	@Inject(at = @At("HEAD"), method = "renderEntity")
 	private void renderEntity(Entity entity, double camX, double camY, double camZ, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, CallbackInfo ci) {
-		_trackedEntity = entity;
-		if(JetOverlayClient.shouldRenderOutline) {
-            if (JetOverlayClient.markedEntities.contains(entity.getId())) {
-				MultiBufferSource multiBufferSource;
-				OutlineBufferSource outlineBufferSource = this.renderBuffers.outlineBufferSource();
-				multiBufferSource = outlineBufferSource;
-				int i = entity.getTeamColor();
-				outlineBufferSource.setColor(0x16711680, 0, 0, 255);
-
-            }
+		if (entity instanceof LivingEntity) {
+			_trackedEntity = (LivingEntity) entity;
 		}
 
+		if (JetOverlayClient.markedEntities.contains(_trackedEntity) && JetOverlayClient.shouldRenderOutline) {
+			OutlineBufferSource outlineBufferSource = renderBuffers.outlineBufferSource();
+
+			int[] colors = outlineColorFromHealthPercentage(_trackedEntity.getHealth() / _trackedEntity.getMaxHealth());
+			outlineBufferSource.setColor(colors[0], colors[1], colors[2], 0xFFFFFFFF);
+		}
 	}
+
 	@Inject(at = @At("HEAD"), method = "shouldShowEntityOutlines", cancellable = true)
 	private void doEntityOutline(CallbackInfoReturnable<Boolean> cir) {
-        if (!this.minecraft.gameRenderer.isPanoramicMode() && this.entityTarget != null && this.entityEffect != null && this.minecraft.player != null || JetOverlayClient.shouldRenderOutline && _trackedEntity != null && JetOverlayClient.markedEntities.contains((Object)_trackedEntity.getId())) {
+        if (!this.minecraft.gameRenderer.isPanoramicMode() && this.entityTarget != null && this.entityEffect != null && this.minecraft.player != null || JetOverlayClient.shouldRenderOutline && _trackedEntity != null && JetOverlayClient.markedEntities.contains(_trackedEntity)) {
 			cir.setReturnValue(true);
-		}
-
-
+        }
 	}
-
 }
