@@ -1,5 +1,6 @@
 package com.luna.jetoverlay;
 
+import com.luna.jetoverlay.client.GogglesReceiverScreen;
 import com.luna.jetoverlay.client.HudOverlay;
 import com.luna.jetoverlay.client.JetOverlayHud;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.entity.LivingEntity;
 import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
@@ -40,8 +42,8 @@ public class JetOverlayClient implements ClientModInitializer {
 				shouldRenderOutline = !shouldRenderOutline;
 			}
 		});
+		MenuScreens.register(JetOverlay.GOGGLES_RECEIVER_SCREEN_HANDLER, GogglesReceiverScreen::new);
 		WorldRenderEvents.END.register((whatever) -> {
-
 		});
 
 	}
