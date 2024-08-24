@@ -1,5 +1,6 @@
 package com.luna.jetoverlay.client;
 
+import com.luna.jetoverlay.CameraRotationDirection;
 import com.luna.jetoverlay.JetOverlayClient;
 import com.luna.jetoverlay.armor.JetGoggles;
 import com.luna.jetoverlay.networking.PacketSender;
@@ -17,8 +18,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.*;
-
-import java.util.List;
 
 public class JetOverlayHud implements HudRenderCallback {
 

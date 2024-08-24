@@ -1,6 +1,9 @@
 package com.luna.jetoverlay.screens;
 
+import com.luna.jetoverlay.CameraRotationDirection;
 import com.luna.jetoverlay.JetOverlay;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -12,12 +15,21 @@ import org.jetbrains.annotations.NotNull;
 
 public class GogglesReceiverScreenHandler extends AbstractContainerMenu {
 	private final Container blockInventory;
+	public BlockPos receiverPosition = BlockPos.ZERO;
+	public CameraRotationDirection receiverDirection = CameraRotationDirection.RIGHT;
+
 
 	//This constructor gets called on the client when the server wants it to open the screenHandler,
 	//The client will call the other constructor with an empty Inventory and the screenHandler will automatically
 	//sync this empty inventory with the inventory on the server.
-	public GogglesReceiverScreenHandler(int syncId, Inventory playerInventory) {
+	public GogglesReceiverScreenHandler(int syncId, Inventory playerInventory, FriendlyByteBuf buf) {
 		this(syncId, playerInventory, new SimpleContainer(1));
+
+		if (buf != null) {
+			receiverPosition = buf.readBlockPos();
+			receiverDirection = CameraRotationDirection.values()[buf.readInt()];
+			JetOverlay.LOGGER.info("Opened goggles menu for block at {}", receiverPosition);
+		}
 	}
 
 	//This constructor gets called from the BlockEntity on the server without calling the other constructor first, the server knows the inventory of the container
@@ -26,7 +38,6 @@ public class GogglesReceiverScreenHandler extends AbstractContainerMenu {
 		super(JetOverlay.GOGGLES_RECEIVER_SCREEN_HANDLER, syncId);
 		assert(inventory.getContainerSize() == 1);
 		blockInventory = inventory;
-
 		//some inventories do custom logic when a player opens it.
 		blockInventory.startOpen(playerInventory.player);
 
@@ -36,11 +47,7 @@ public class GogglesReceiverScreenHandler extends AbstractContainerMenu {
 		int l;
 		//Our inventory
 		addSlot(new Slot(inventory, 0, 19, 17));
-		/*
-		for (m = 0; m < 3; ++m) {
-			for (l = 0; l < 3; ++l) {
-			}
-		}*/
+
 		//The player inventory
 		for (m = 0; m < 3; ++m) {
 			for (l = 0; l < 9; ++l) {

@@ -3,10 +3,10 @@ package com.luna.jetoverlay;
 import com.luna.jetoverlay.screens.GogglesReceiverScreenHandler;
 import net.fabricmc.api.ModInitializer;
 
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.MenuType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class JetOverlay implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("jetoverlay");
 
 	public static final MenuType<GogglesReceiverScreenHandler> GOGGLES_RECEIVER_SCREEN_HANDLER
-			= new MenuType<>(GogglesReceiverScreenHandler::new, FeatureFlagSet.of());
+			= new ExtendedScreenHandlerType<>(GogglesReceiverScreenHandler::new);
 
 	@Override
 	public void onInitialize() {
@@ -28,5 +28,6 @@ public class JetOverlay implements ModInitializer {
 		// ScreenHandlerRegistry;
 		Registry.register(BuiltInRegistries.MENU, new ResourceLocation("jetoverlay", "redstoneoutputter"), GOGGLES_RECEIVER_SCREEN_HANDLER);
 		ModItems.initialize();
+		ModNetworking.initialize();
 	}
 }
