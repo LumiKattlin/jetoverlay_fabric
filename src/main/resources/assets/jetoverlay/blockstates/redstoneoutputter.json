@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "jetoverlay:block/redstoneoutputter" }
+  }
+}
