@@ -205,7 +205,7 @@ public class RotationToRedstoneEntity extends BaseContainerBlockEntity
 
     public static <T extends BlockEntity> void tick(Level __level, BlockPos __blockPos, BlockState __blockState, T __entity) {
         long currentTick = __level.getGameTime();
-
+        System.out.println("tick tick tack");
         if (currentTick != _lastRotationUpdateTick) {
             _lastRotationUpdateTick = currentTick;
             updateGlobalRotations(__level);
