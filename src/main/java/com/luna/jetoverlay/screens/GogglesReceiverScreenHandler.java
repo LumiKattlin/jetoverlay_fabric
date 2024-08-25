@@ -78,13 +78,15 @@ public class GogglesReceiverScreenHandler extends AbstractContainerMenu {
 				if (!moveItemStackTo(originalStack, blockInventory.getContainerSize(), this.slots.size(), true)) {
 					return ItemStack.EMPTY;
 				}
-			} else if (!moveItemStackTo(originalStack, 0, blockInventory.getContainerSize(), false)) {
+			}
+			else if (!moveItemStackTo(originalStack, 0, blockInventory.getContainerSize(), false)) {
 				return ItemStack.EMPTY;
 			}
 
 			if (originalStack.isEmpty()) {
 				slot.set(ItemStack.EMPTY);
-			} else {
+			}
+			else {
 				slot.setChanged();
 			}
 		}

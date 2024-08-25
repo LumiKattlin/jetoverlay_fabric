@@ -1,4 +1,4 @@
-package com.luna.jetoverlay.client;
+package com.luna.jetoverlay;
 
 public enum CameraRotationDirection {
 	RIGHT,
