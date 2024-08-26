@@ -8,13 +8,16 @@ import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 public class ModItems {
 
-    public static final Item JET_GOGGLES = registerItem(new ArmorItem(JetGoggles.INSTANCE, ArmorItem.Type.HELMET, new Item.Properties()), "jet_goggles");
+    public static final Item JET_GOGGLES = registerItem(new ArmorItem(JetGoggles.INSTANCE, ArmorItem.Type.HELMET,
+                                                                      new Item.Properties().requiredFeatures(FeatureFlags.VANILLA)),
+                                                        "jet_goggles");
     public static final Block JET_GOGGLES_RECEIVER = Registry.register(
             BuiltInRegistries.BLOCK,
             new ResourceLocation("jetoverlay", "redstoneoutputter"),

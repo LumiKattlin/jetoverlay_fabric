@@ -126,13 +126,13 @@ public class JetOverlayHud implements HudRenderCallback {
 	@Override
     public void onHudRender(GuiGraphics __drawContext, float __tickDelta) {
 
-		CameraRotationDirection rotationDirection = detectCameraRotation(Minecraft.getInstance().gameRenderer.getMainCamera());
-		if (rotationDirection == CameraRotationDirection.LEFT || rotationDirection == CameraRotationDirection.RIGHT) {
-			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 10, 0x00FF00);
-		}
-		if (rotationDirection == CameraRotationDirection.DOWN || rotationDirection == CameraRotationDirection.UP) {
-			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 20, 0x00FF00);
-		}
+//		CameraRotationDirection rotationDirection = detectCameraRotation(Minecraft.getInstance().gameRenderer.getMainCamera());
+//		if (rotationDirection == CameraRotationDirection.LEFT || rotationDirection == CameraRotationDirection.RIGHT) {
+//			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 10, 0x00FF00);
+//		}
+//		if (rotationDirection == CameraRotationDirection.DOWN || rotationDirection == CameraRotationDirection.UP) {
+//			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 20, 0x00FF00);
+//		}
 
 		if (JetOverlayClient.shouldRenderOutline) {
 			renderOverlay(__drawContext, __tickDelta);
