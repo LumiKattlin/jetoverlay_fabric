@@ -1,14 +1,10 @@
 package com.luna.jetoverlay.mixin.client;
 
 import com.luna.jetoverlay.JetOverlayClient;
-import com.luna.jetoverlay.client.JetOverlayHud;
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.util.FastColor;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +47,7 @@ public abstract class MixinOutlineRenderer {
 			_trackedEntity = (LivingEntity) entity;
 		}
 
-		if (JetOverlayClient.markedEntities.contains(_trackedEntity) && JetOverlayClient.shouldRenderOutline) {
+		if (JetOverlayClient.markedEntities.contains(_trackedEntity) && JetOverlayClient.renderOverlay) {
 			OutlineBufferSource outlineBufferSource = renderBuffers.outlineBufferSource();
 
 			int[] colors = outlineColorFromHealthPercentage(_trackedEntity.getHealth() / _trackedEntity.getMaxHealth());
@@ -61,7 +57,7 @@ public abstract class MixinOutlineRenderer {
 
 	@Inject(at = @At("HEAD"), method = "shouldShowEntityOutlines", cancellable = true)
 	private void doEntityOutline(CallbackInfoReturnable<Boolean> cir) {
-        if (!this.minecraft.gameRenderer.isPanoramicMode() && this.entityTarget != null && this.entityEffect != null && this.minecraft.player != null || JetOverlayClient.shouldRenderOutline && _trackedEntity != null && JetOverlayClient.markedEntities.contains(_trackedEntity)) {
+        if (!this.minecraft.gameRenderer.isPanoramicMode() && this.entityTarget != null && this.entityEffect != null && this.minecraft.player != null || JetOverlayClient.renderOverlay && _trackedEntity != null && JetOverlayClient.markedEntities.contains(_trackedEntity)) {
 			cir.setReturnValue(true);
         }
 	}

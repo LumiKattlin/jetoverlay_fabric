@@ -12,8 +12,9 @@ public class HudOverlay implements HudRenderCallback {
 
     @Override
     public void onHudRender(GuiGraphics drawContext, float tickDelta) {
-        if (JetOverlayClient.shouldRenderOutline) {
-           // drawContext.blit(leftElement, 0, 90, 0, 0, 0,8 ,200 , 8, 200);
-        }
+        // TODO: Replace this with a better overlay UI.
+//        if (JetOverlayClient.renderOverlay) {
+//            drawContext.blit(leftElement, 0, 90, 0, 0, 0,8 ,200 , 8, 200);
+//        }
     }
 }

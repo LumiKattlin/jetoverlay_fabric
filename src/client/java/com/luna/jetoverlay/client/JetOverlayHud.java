@@ -2,6 +2,7 @@ package com.luna.jetoverlay.client;
 
 import com.luna.jetoverlay.CameraRotationDirection;
 import com.luna.jetoverlay.JetOverlayClient;
+import com.luna.jetoverlay.ModItems;
 import com.luna.jetoverlay.armor.JetGoggles;
 import com.luna.jetoverlay.networking.PacketSender;
 import net.minecraft.client.Camera;
@@ -125,55 +126,13 @@ public class JetOverlayHud implements HudRenderCallback {
 
 	@Override
     public void onHudRender(GuiGraphics __drawContext, float __tickDelta) {
+		JetOverlayClient.renderOverlay = Minecraft.getInstance().player != null
+			&& Minecraft.getInstance().player.getInventory().getArmor(3).is(ModItems.JET_GOGGLES);
 
-//		CameraRotationDirection rotationDirection = detectCameraRotation(Minecraft.getInstance().gameRenderer.getMainCamera());
-//		if (rotationDirection == CameraRotationDirection.LEFT || rotationDirection == CameraRotationDirection.RIGHT) {
-//			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 10, 0x00FF00);
-//		}
-//		if (rotationDirection == CameraRotationDirection.DOWN || rotationDirection == CameraRotationDirection.UP) {
-//			__drawContext.drawString(Minecraft.getInstance().font, rotationDirection.toString(), 0, 20, 0x00FF00);
-//		}
-
-		if (JetOverlayClient.shouldRenderOutline) {
+		if (JetOverlayClient.renderOverlay) {
 			renderOverlay(__drawContext, __tickDelta);
 		}
 	}
 
 	ResourceLocation _clientChannel = new ResourceLocation("jetoverlay_client", "redstone_emitter_client");
-
-	public CameraRotationDirection detectCameraRotation(Camera __camera) {
-		//X axis decreases when going up, increases when going down
-
-		if (__camera.getXRot() != _originalXRot) {
-			if (__camera.getXRot() < _originalXRot) {
-				_originalXRot = __camera.getXRot();
-				PacketSender.SendPacket("Yippe");
-				return CameraRotationDirection.UP;
-
-			}
-			else {
-				_originalXRot = __camera.getXRot();
-				return CameraRotationDirection.DOWN;
-			}
-		}
-		//Y axis decreases when going to the left, increases when going to the right
-		if (__camera.getYRot() != _originalYRot) {
-			if (__camera.getYRot() < _originalYRot) {
-				_originalYRot = __camera.getYRot();
-				return CameraRotationDirection.LEFT;
-			}
-			else {
-				_originalYRot = __camera.getYRot();
-				return CameraRotationDirection.RIGHT;
-			}
-		}
-		return CameraRotationDirection.NOTHING;
-	}
-	public float ReturnRotationDifference(float __originalPos, float __newPos) {
-		return __newPos - __originalPos;
-	}
-	public float ReturnRedstonePower(float __difference) {
-		float _redstonePower = 0;
-		return _redstonePower;
-	}
 }

@@ -1,6 +1,5 @@
 package com.luna.jetoverlay.mixin.client;
 import com.luna.jetoverlay.JetOverlayClient;
-import com.luna.jetoverlay.client.JetOverlayHud;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,7 +18,7 @@ public abstract class MixinEntityRenderer {
             ent = (LivingEntity) entity;
         }
 
-        if(entity.isCurrentlyGlowing() || JetOverlayClient.shouldRenderOutline && JetOverlayClient.markedEntities.contains(ent)) {
+        if(entity.isCurrentlyGlowing() || JetOverlayClient.renderOverlay && JetOverlayClient.markedEntities.contains(ent)) {
             cir.setReturnValue(true);
         }
     }
