@@ -4,10 +4,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -34,17 +36,17 @@ public class JetGoggles implements ArmorMaterial {
     }
 
     @Override
-    public SoundEvent getEquipSound() {
-        return null;
+    public @NotNull SoundEvent getEquipSound() {
+        return SoundEvents.ARMOR_EQUIP_GENERIC;
     }
 
     @Override
-    public Ingredient getRepairIngredient() {
-        return null;
+    public @NotNull Ingredient getRepairIngredient() {
+        return Ingredient.EMPTY;
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return "jetgoggles";
     }
 
