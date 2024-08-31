@@ -1,10 +1,7 @@
 package com.luna.jetoverlay;
 
 import com.luna.jetoverlay.armor.JetGoggles;
-import com.luna.jetoverlay.blocks.DistanceSensor;
-import com.luna.jetoverlay.blocks.DistanceSensorEntity;
-import com.luna.jetoverlay.blocks.RotationToRedstone;
-import com.luna.jetoverlay.blocks.RotationToRedstoneEntity;
+import com.luna.jetoverlay.blocks.*;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.Registry;
@@ -44,6 +41,14 @@ public class ModItems {
                                                                                         BlockEntityType.Builder.of(DistanceSensorEntity::new, DISTANCE_SENSOR).build(null)
                                                                                                         );
 
+    
+    public static final Block COLLISION_DETECTOR = Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(
+            "jetoverlay", "collision_detector"), new CollisionDetector(FabricBlockSettings.create().strength(4)));
+    
+    public static final BlockEntityType<CollisionDetectorEntity> COLLISION_DETECTOR_ENTITY =
+            Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation("jetoverlay",
+                                                                                        "collision_detector"),
+                              BlockEntityType.Builder.of(CollisionDetectorEntity::new, COLLISION_DETECTOR).build(null));
     public static Item registerItem(Item item, String id) {
         return Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("jetoverlay", id), item);
     }
@@ -54,9 +59,11 @@ public class ModItems {
        var receiverBlock = registerItem(new BlockItem(ModItems.JET_GOGGLES_RECEIVER, new Item.Properties()), "redstoneoutputter");
        var distanceSensorBlockItem = registerItem(new BlockItem(ModItems.DISTANCE_SENSOR, new Item.Properties()),
                                        "distancesensor");
-
+       var CollisionDetectorBlock = registerItem(new BlockItem(ModItems.COLLISION_DETECTOR,new Item.Properties()),
+                                                               "collision_detector");
        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register((itemGroup -> itemGroup.accept(receiverBlock)));
        ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register((itemgroup) -> itemgroup.accept(distanceSensorBlockItem));
+       ItemGroupEvents.modifyEntriesEvent(CreativeModeTabs.BUILDING_BLOCKS).register((itemgroup) -> itemgroup.accept(CollisionDetectorBlock));
 
 
     }
