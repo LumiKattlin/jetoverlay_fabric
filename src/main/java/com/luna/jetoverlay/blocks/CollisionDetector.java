@@ -12,6 +12,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class CollisionDetector extends Block implements EntityBlock {
     public CollisionDetector (Properties properties) {
         super(properties);
@@ -19,7 +21,8 @@ public class CollisionDetector extends Block implements EntityBlock {
     
     @Override
     public int getSignal (BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return super.getSignal(state, level, pos, direction);
+        byte _value = ((CollisionDetectorEntity) Objects.requireNonNull(level.getBlockEntity(pos)))._redstonePower;
+        return _value;
     }
     
     @Override
@@ -33,4 +36,6 @@ public class CollisionDetector extends Block implements EntityBlock {
             return null;
         return CollisionDetectorEntity::tick;
     }
+    
+    
 }
