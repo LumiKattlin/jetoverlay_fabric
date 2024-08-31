@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 
 public class ModNetworking {
 	public static final ResourceLocation LINK_GOGGLES_PACKET_ID = new ResourceLocation("jetgoggles", "packets/link_goggles");
@@ -35,10 +36,11 @@ public class ModNetworking {
 		if (!(entity instanceof RotationToRedstoneEntity receiverEntity)) {
 			return;
 		}
-
+		player.setItemSlot(EquipmentSlot.HEAD, ModItems.JET_GOGGLES.getDefaultInstance());
 		receiverEntity._boundDirection = direction;
 		JetOverlay.LOGGER.info("New block direction: " + direction);
 		receiverEntity.setChanged();
+		
 	}
 
 	public static void initialize() {
