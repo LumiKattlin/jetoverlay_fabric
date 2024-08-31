@@ -26,7 +26,7 @@ public class JetOverlayHud implements HudRenderCallback {
 	private final int _NEARBY_ENTITIES_RANGE = 30;
 
 	float _originalXRot;
-	float _originalYRot ;
+	float _originalYRot;
 
 	protected void drawTextAt(String text, int color, Vector3f worldPosition, GuiGraphics drawContext, LivingEntity entity) {
 		Minecraft mc = Minecraft.getInstance();
@@ -125,9 +125,9 @@ public class JetOverlayHud implements HudRenderCallback {
 	}
 
 	@Override
-    public void onHudRender(GuiGraphics __drawContext, float __tickDelta) {
+	public void onHudRender(GuiGraphics __drawContext, float __tickDelta) {
 		JetOverlayClient.renderOverlay = Minecraft.getInstance().player != null
-			&& Minecraft.getInstance().player.getInventory().getArmor(3).is(ModItems.JET_GOGGLES);
+				&& Minecraft.getInstance().player.getInventory().getArmor(3).is(ModItems.JET_GOGGLES);
 
 		if (JetOverlayClient.renderOverlay) {
 			renderOverlay(__drawContext, __tickDelta);

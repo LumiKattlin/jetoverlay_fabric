@@ -89,7 +89,7 @@ public class GogglesReceiverScreen extends AbstractContainerScreen<GogglesReceiv
 						buffer.writeBlockPos(getMenu().receiverPosition);
 						buffer.writeInt(i.ordinal());
 
-						ClientPlayNetworking.send(ModNetworking.SET_BLOCK_DIRECTION_PACKET_ID, buffer);
+						ClientPlayNetworking.send(ModNetworking.SET_ROTATION_BLOCK_DIRECTION_PACKET_ID, buffer);
 					})
 					.bounds(leftPos + buttonPosX, topPos + 9 + i.ordinal() * 17, buttonWidth, 16).build();
 

@@ -23,7 +23,6 @@ import java.util.Objects;
 
 public class RotationToRedstone extends Block implements EntityBlock {
 
-    CompoundTag nbt = new CompoundTag();
     public RotationToRedstone(Properties properties) {
         super(properties);
     }
@@ -36,8 +35,6 @@ public class RotationToRedstone extends Block implements EntityBlock {
 
     @Override
     public @NotNull InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        var itemStack = player.getItemInHand(hand);
-
         if (!level.isClientSide) {
             ((ServerPlayer) player).openMenu((RotationToRedstoneEntity) level.getBlockEntity(pos));
         }
@@ -64,12 +61,12 @@ public class RotationToRedstone extends Block implements EntityBlock {
 
     @Override
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        byte value = ((RotationToRedstoneEntity) Objects.requireNonNull(level.getBlockEntity(pos))).getRedstoneValue();
-        return value;
+        return ((RotationToRedstoneEntity) Objects.requireNonNull(level.getBlockEntity(pos))).getRedstoneValue();
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new RotationToRedstoneEntity(pos, state);
     }
+
 }

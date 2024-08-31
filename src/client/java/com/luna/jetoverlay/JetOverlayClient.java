@@ -1,17 +1,24 @@
 package com.luna.jetoverlay;
 
+import com.luna.jetoverlay.blocks.DistanceSensorEntity;
+import com.luna.jetoverlay.client.DistanceSensorScreen;
 import com.luna.jetoverlay.client.GogglesReceiverScreen;
 import com.luna.jetoverlay.client.HudOverlay;
 import com.luna.jetoverlay.client.JetOverlayHud;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.lwjgl.glfw.GLFW;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +29,24 @@ public class JetOverlayClient implements ClientModInitializer {
 			InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_LEFT_CONTROL,
 			"jetoverlay"
-			);
+	);
+
 	public static final KeyMapping markEntityAsTarget = new KeyMapping("key.mark-entity-target",
 			InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_D,
 			"jetoverlay"
-			);
+	);
 
+	private static void createDistanceSensorScreen(BlockPos __block, int __initialRange, boolean __onlyPlayers) {
+		if (Minecraft.getInstance().level == null)
+			return;
+
+		BlockEntity ent = Minecraft.getInstance().level.getBlockEntity(__block);
+		if (!(ent instanceof DistanceSensorEntity))
+			return;
+
+		Minecraft.getInstance().setScreen(new DistanceSensorScreen(__block, __initialRange, __onlyPlayers));
+	}
 
 	@Override
 	public void onInitializeClient() {
@@ -37,10 +55,13 @@ public class JetOverlayClient implements ClientModInitializer {
 		KeyBindingHelper.registerKeyBinding(toggle_outline);
 		KeyBindingHelper.registerKeyBinding(markEntityAsTarget);
 		MenuScreens.register(JetOverlay.GOGGLES_RECEIVER_SCREEN_HANDLER, GogglesReceiverScreen::new);
-		WorldRenderEvents.END.register((whatever) -> {
-		});
 
+		ClientPlayNetworking.registerGlobalReceiver(ModNetworking.OPEN_SENSOR_PACKET_ID,
+				(client, handler, buf, responseSender) -> {
+					BlockPos pos = buf.readBlockPos();
+					int range = buf.readInt();
+					boolean onlyPlayers = buf.readBoolean();
+					client.execute(() -> createDistanceSensorScreen(pos, range, onlyPlayers));
+				});
 	}
-
-
 }
