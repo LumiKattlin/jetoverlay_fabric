@@ -1,6 +1,7 @@
 package com.luna.jetoverlay;
 
 import com.luna.jetoverlay.armor.JetGoggles;
+import com.luna.jetoverlay.blocks.CollisionDetectorEntity;
 import com.luna.jetoverlay.blocks.DistanceSensor;
 import com.luna.jetoverlay.blocks.DistanceSensorEntity;
 import com.luna.jetoverlay.blocks.RotationToRedstoneEntity;
@@ -15,6 +16,9 @@ public class ModNetworking {
 	public static final ResourceLocation OPEN_SENSOR_PACKET_ID = new ResourceLocation("jetgoggles", "packets/open_sensor");
 	public static final ResourceLocation SET_SENSOR_RANGE_PACKET_ID = new ResourceLocation("jetgoggles", "packets/sensor_range");
 	public static final ResourceLocation SENSOR_INCLUDE_PLAYERS_PACKET_ID = new ResourceLocation("jetgoggles", "packets/sensor_include_players");
+	public static final ResourceLocation OPEN_BLOCK_DETECTOR_PACKET_ID = new ResourceLocation("jetgoggles", "packets/open_block_detector");
+	public static final ResourceLocation BLOCK_DETECTOR_SET_RANGE_PACKET_ID = new ResourceLocation("jetgoggles", "packets/block_detector_set_range");
+	public static final ResourceLocation BLOCK_DETECTOR_SET_THICKNESS_PACKET_ID = new ResourceLocation("jetgoggles", "packets/block_detector_set_thickness");
 
 	private static void handleLinkPacket(BlockPos pos, ServerPlayer player) {
 		var entity = player.level().getBlockEntity(pos);
@@ -43,7 +47,6 @@ public class ModNetworking {
 		}
 
 		receiverEntity._boundDirection = direction;
-		JetOverlay.LOGGER.info("New block direction: " + direction);
 		receiverEntity.setChanged();
 	}
 
@@ -56,21 +59,38 @@ public class ModNetworking {
 			return;
 		}
 
-		JetOverlay.LOGGER.info("new block range: " + newRange);
-
 		sensorEntity.range = newRange;
 		sensorEntity.setChanged();
 	}
+
 	private static void handleSensorIncludePlayersPacket(BlockPos pos, boolean newValue, ServerPlayer player) {
 		var entity = player.level().getBlockEntity(pos);
 		if (!(entity instanceof DistanceSensorEntity sensorEntity)) {
 			return;
 		}
 
-		JetOverlay.LOGGER.info("Sensor includes players: " + newValue);
-
 		sensorEntity.onlyIncludePlayers = newValue;
 		sensorEntity.setChanged();
+	}
+
+	private static void handleBlockDetectorSetRangePacket(BlockPos pos, int newValue, ServerPlayer player) {
+		var entity = player.level().getBlockEntity(pos);
+		if (!(entity instanceof CollisionDetectorEntity blockDetectorEntity)) {
+			return;
+		}
+
+		blockDetectorEntity.range = newValue;
+		blockDetectorEntity.setChanged();
+	}
+
+	private static void handleBlockDetectorSetWidthPacket(BlockPos pos, int newValue, ServerPlayer player) {
+		var entity = player.level().getBlockEntity(pos);
+		if (!(entity instanceof CollisionDetectorEntity blockDetectorEntity)) {
+			return;
+		}
+
+		blockDetectorEntity.width = newValue;
+		blockDetectorEntity.setChanged();
 	}
 
 	public static void initialize() {
@@ -106,5 +126,24 @@ public class ModNetworking {
 			// Make sure we're on the main server thread before accessing any of the block entity stuff.
 			server.execute(() -> handleSensorIncludePlayersPacket(pos, include, player));
 		});
+
+		ServerPlayNetworking.registerGlobalReceiver(BLOCK_DETECTOR_SET_RANGE_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+			BlockPos pos = buf.readBlockPos();
+
+			int range = buf.readInt();
+			// Receiving packets happens on a different thread.
+			// Make sure we're on the main server thread before accessing any of the block entity stuff.
+			server.execute(() -> handleBlockDetectorSetRangePacket(pos, range, player));
+		});
+
+		ServerPlayNetworking.registerGlobalReceiver(BLOCK_DETECTOR_SET_THICKNESS_PACKET_ID, (server, player, handler, buf, responseSender) -> {
+			BlockPos pos = buf.readBlockPos();
+
+			int width = buf.readInt();
+			// Receiving packets happens on a different thread.
+			// Make sure we're on the main server thread before accessing any of the block entity stuff.
+			server.execute(() -> handleBlockDetectorSetWidthPacket(pos, width, player));
+		});
+
 	}
 }

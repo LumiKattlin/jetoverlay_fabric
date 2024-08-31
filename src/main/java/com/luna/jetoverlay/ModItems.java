@@ -44,12 +44,14 @@ public class ModItems {
 
 
 	public static final Block COLLISION_DETECTOR = Registry.register(BuiltInRegistries.BLOCK, new ResourceLocation(
-			"jetoverlay", "collision_detector"), new CollisionDetector(FabricBlockSettings.create().strength(4)));
+			"jetoverlay", "collision_detector"),
+			new CollisionDetector(FabricBlockSettings.create().strength(4)));
 
 	public static final BlockEntityType<CollisionDetectorEntity> COLLISION_DETECTOR_ENTITY =
 			Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, new ResourceLocation("jetoverlay",
 							"collision_detector"),
-					BlockEntityType.Builder.of(CollisionDetectorEntity::new, COLLISION_DETECTOR).build(null));
+					BlockEntityType.Builder.of(CollisionDetectorEntity::new, COLLISION_DETECTOR)
+							.build(null));
 
 	public static Item registerItem(Item item, String id) {
 		return Registry.register(BuiltInRegistries.ITEM, new ResourceLocation("jetoverlay", id), item);

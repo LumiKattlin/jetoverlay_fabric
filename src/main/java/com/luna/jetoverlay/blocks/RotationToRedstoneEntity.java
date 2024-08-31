@@ -27,188 +27,180 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class RotationToRedstoneEntity extends BaseContainerBlockEntity
-        implements ExtendedScreenHandlerFactory, MenuProvider {
-    public RotationToRedstoneEntity(BlockPos pos, BlockState blockState) {
-        super(ModItems.JET_GOGGLES_RECEIVER_ENTITY, pos, blockState);
-    }
+		implements ExtendedScreenHandlerFactory, MenuProvider {
+	public RotationToRedstoneEntity(BlockPos pos, BlockState blockState) {
+		super(ModItems.JET_GOGGLES_RECEIVER_ENTITY, pos, blockState);
+	}
 
-    ItemStack insertedItem = ItemStack.EMPTY;
-    public GogglesReceiverScreenHandler _currentScreen = null;
-    public CameraRotationDirection _boundDirection = CameraRotationDirection.RIGHT;
-    private byte _redstoneValue = 0;
-    private static long _lastRotationUpdateTick = 0;
-    private static HashMap<Player, Vec2> _oldPlayerRotations = new HashMap<>();
+	ItemStack insertedItem = ItemStack.EMPTY;
+	public GogglesReceiverScreenHandler _currentScreen = null;
+	public CameraRotationDirection _boundDirection = CameraRotationDirection.RIGHT;
+	private byte _redstoneValue = 0;
+	private static long _lastRotationUpdateTick = 0;
+	private static final HashMap<Player, Vec2> _oldPlayerRotations = new HashMap<>();
 
-    @Override
-    public @NotNull Component getDisplayName() {
-        return Component.literal("Goggles Receiver");
-    }
+	@Override
+	public @NotNull Component getDisplayName() {
+		return Component.literal("Goggles Receiver");
+	}
 
-    @Override
-    protected @NotNull Component getDefaultName() {
-        return getDisplayName();
-    }
+	@Override
+	protected @NotNull Component getDefaultName() {
+		return getDisplayName();
+	}
 
-    @Override
-    public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        _currentScreen = new GogglesReceiverScreenHandler(i, inventory, this);
-        return _currentScreen;
-    }
+	@Override
+	public @Nullable AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+		_currentScreen = new GogglesReceiverScreenHandler(i, inventory, this);
+		return _currentScreen;
+	}
 
-    @Override
-    protected @NotNull AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
-        _currentScreen = new GogglesReceiverScreenHandler(containerId, inventory, (FriendlyByteBuf) null);
-        return _currentScreen;
-    }
+	@Override
+	protected @NotNull AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+		_currentScreen = new GogglesReceiverScreenHandler(containerId, inventory, (FriendlyByteBuf) null);
+		return _currentScreen;
+	}
 
-    @Override
-    public int getContainerSize() {
-        return 1;
-    }
+	@Override
+	public int getContainerSize() {
+		return 1;
+	}
 
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
+	@Override
+	public boolean isEmpty() {
+		return false;
+	}
 
-    @Override
-    public @NotNull ItemStack getItem(int slot) {
-        if (slot == 0)
-            return insertedItem;
-        return ItemStack.EMPTY;
-    }
+	@Override
+	public @NotNull ItemStack getItem(int slot) {
+		if (slot == 0)
+			return insertedItem;
+		return ItemStack.EMPTY;
+	}
 
-    @Override
-    public @NotNull ItemStack removeItem(int slot, int amount) {
-        ItemStack newStack = insertedItem.copy();
-        newStack.setCount(amount);
-        insertedItem.setCount(insertedItem.getCount() - amount);
-        if (insertedItem.getCount() <= 0) {
-            insertedItem = ItemStack.EMPTY;
-        }
-        return newStack;
-    }
+	@Override
+	public @NotNull ItemStack removeItem(int slot, int amount) {
+		ItemStack newStack = insertedItem.copy();
+		newStack.setCount(amount);
+		insertedItem.setCount(insertedItem.getCount() - amount);
+		if (insertedItem.getCount() <= 0) {
+			insertedItem = ItemStack.EMPTY;
+		}
+		return newStack;
+	}
 
-    @Override
-    public @NotNull ItemStack removeItemNoUpdate(int slot) {
-        insertedItem = ItemStack.EMPTY;
-        return insertedItem;
-    }
+	@Override
+	public @NotNull ItemStack removeItemNoUpdate(int slot) {
+		insertedItem = ItemStack.EMPTY;
+		return insertedItem;
+	}
 
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-        if (slot == 0)
-            insertedItem = stack;
-    }
+	@Override
+	public void setItem(int slot, ItemStack stack) {
+		if (slot == 0)
+			insertedItem = stack;
+	}
 
-    @Override
-    public boolean stillValid(Player player) {
-        return true;
-    }
+	@Override
+	public boolean stillValid(Player player) {
+		return true;
+	}
 
-    @Override
-    public void writeScreenOpeningData(ServerPlayer serverPlayerEntity, FriendlyByteBuf packetByteBuf) {
-        //The pos field is a public field from BlockEntity
-        packetByteBuf.writeBlockPos(getBlockPos());
-        packetByteBuf.writeInt(_boundDirection.ordinal());
-    }
+	@Override
+	public void writeScreenOpeningData(ServerPlayer serverPlayerEntity, FriendlyByteBuf packetByteBuf) {
+		//The pos field is a public field from BlockEntity
+		packetByteBuf.writeBlockPos(getBlockPos());
+		packetByteBuf.writeInt(_boundDirection.ordinal());
+	}
 
-    @Override
-    public void clearContent() {
-        insertedItem = ItemStack.EMPTY;
-    }
+	@Override
+	public void clearContent() {
+		insertedItem = ItemStack.EMPTY;
+	}
 
-    @Override
-    public void load(CompoundTag __nbt) {
-        super.load(__nbt);
-        _boundDirection = CameraRotationDirection.values()[__nbt.getInt("Direction")];
-        if (_boundDirection == null) {
-            _boundDirection = CameraRotationDirection.RIGHT;
-        }
-    }
+	@Override
+	public void load(CompoundTag __nbt) {
+		super.load(__nbt);
+		_boundDirection = CameraRotationDirection.values()[__nbt.getInt("Direction")];
+		if (_boundDirection == null) {
+			_boundDirection = CameraRotationDirection.RIGHT;
+		}
+	}
 
-    @Override
-    public void saveAdditional(CompoundTag __nbt) {
-        super.saveAdditional(__nbt);
-        // Save the current value of the number to the nbt
-        __nbt.putInt("Direction", _boundDirection.ordinal());
-    }
+	@Override
+	public void saveAdditional(CompoundTag __nbt) {
+		super.saveAdditional(__nbt);
+		// Save the current value of the number to the nbt
+		__nbt.putInt("Direction", _boundDirection.ordinal());
+	}
 
-    private void setRedstoneValueFromRotation(float rotationValue) {
-        byte newValue = (byte) Math.max(rotationValue / 5.0f, 0.0f);
-        if (newValue == 0 && rotationValue > 0) {
-            newValue = 1;
-        }
+	private void setRedstoneValueFromRotation(float rotationValue) {
+		byte newValue = (byte) Math.max(rotationValue / 5.0f, 0.0f);
+		if (newValue == 0 && rotationValue > 0) {
+			newValue = 1;
+		}
 
-        if (newValue == _redstoneValue)
-            return;
+		if (newValue == _redstoneValue)
+			return;
 
-        _redstoneValue = newValue;
-        Objects.requireNonNull(getLevel()).blockUpdated(getBlockPos(), getBlockState().getBlock());
-    }
-    public byte getRedstoneValue() {
-        return _redstoneValue;
-    }
+		_redstoneValue = newValue;
+		Objects.requireNonNull(getLevel()).blockUpdated(getBlockPos(), getBlockState().getBlock());
+	}
 
-    private static void sendRotationToBlock(Level __level, BlockPos __block,  Vec2 __rotation) {
-        var entity = __level.getBlockEntity(__block);
-        if (entity == null)
-            return;
+	public byte getRedstoneValue() {
+		return _redstoneValue;
+	}
 
-        if (!(entity instanceof RotationToRedstoneEntity receiverEntity))
-            return;
+	private static void sendRotationToBlock(Level __level, BlockPos __block, Vec2 __rotation) {
+		var entity = __level.getBlockEntity(__block);
+		if (entity == null)
+			return;
 
-        switch (receiverEntity._boundDirection) {
-	        case RIGHT -> {
-                receiverEntity.setRedstoneValueFromRotation(-__rotation.y);
-	        }
-	        case LEFT -> {
-                receiverEntity.setRedstoneValueFromRotation(__rotation.y);
-	        }
-	        case UP -> {
-                receiverEntity.setRedstoneValueFromRotation(__rotation.x);
-	        }
-	        case DOWN -> {
-                receiverEntity.setRedstoneValueFromRotation(-__rotation.x);
-	        }
-	        case NOTHING -> {
-	        }
-        }
-    }
+		if (!(entity instanceof RotationToRedstoneEntity receiverEntity))
+			return;
 
-    private static void updateGlobalRotations(Level __level) {
-        var players = __level.players();
+		switch (receiverEntity._boundDirection) {
+			case RIGHT -> receiverEntity.setRedstoneValueFromRotation(-__rotation.y);
+			case LEFT -> receiverEntity.setRedstoneValueFromRotation(__rotation.y);
+			case UP -> receiverEntity.setRedstoneValueFromRotation(__rotation.x);
+			case DOWN -> receiverEntity.setRedstoneValueFromRotation(-__rotation.x);
+			case NOTHING -> {}
+		}
+	}
 
-        for (Player player : players) {
-            var headItem = player.getInventory().getArmor(3);
+	private static void updateGlobalRotations(Level __level) {
+		var players = __level.players();
 
-            if (!headItem.is(ModItems.JET_GOGGLES))
-                continue;
+		for (Player player : players) {
+			var headItem = player.getInventory().getArmor(3);
 
-            Vec2 rotation = player.getRotationVector();
+			if (!headItem.is(ModItems.JET_GOGGLES))
+				continue;
 
-            if (!_oldPlayerRotations.containsKey(player)) {
-                _oldPlayerRotations.put(player, rotation);
-                continue;
-            }
+			Vec2 rotation = player.getRotationVector();
 
-            Vec2 oldRotation = _oldPlayerRotations.get(player);
-            _oldPlayerRotations.put(player, rotation);
+			if (!_oldPlayerRotations.containsKey(player)) {
+				_oldPlayerRotations.put(player, rotation);
+				continue;
+			}
 
-            Vec2 difference = oldRotation.add(rotation.negated());
+			Vec2 oldRotation = _oldPlayerRotations.get(player);
+			_oldPlayerRotations.put(player, rotation);
 
-            for (BlockPos block : JetGoggles.itemGetBlocks(headItem)) {
-                sendRotationToBlock(__level, block, difference);
-            }
-        }
-    }
+			Vec2 difference = oldRotation.add(rotation.negated());
 
-    public static <T extends BlockEntity> void tick(Level __level, BlockPos __blockPos, BlockState __blockState, T __entity) {
-        long currentTick = __level.getGameTime();
-        if (currentTick != _lastRotationUpdateTick) {
-            _lastRotationUpdateTick = currentTick;
-            updateGlobalRotations(__level);
-        }
-    }
+			for (BlockPos block : JetGoggles.itemGetBlocks(headItem)) {
+				sendRotationToBlock(__level, block, difference);
+			}
+		}
+	}
+
+	public static <T extends BlockEntity> void tick(Level __level, BlockPos __blockPos, BlockState __blockState, T __entity) {
+		long currentTick = __level.getGameTime();
+		if (currentTick != _lastRotationUpdateTick) {
+			_lastRotationUpdateTick = currentTick;
+			updateGlobalRotations(__level);
+		}
+	}
 
 }

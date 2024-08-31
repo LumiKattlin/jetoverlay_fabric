@@ -1,16 +1,13 @@
 package com.luna.jetoverlay;
 
+import com.luna.jetoverlay.blocks.CollisionDetectorEntity;
 import com.luna.jetoverlay.blocks.DistanceSensorEntity;
-import com.luna.jetoverlay.client.DistanceSensorScreen;
-import com.luna.jetoverlay.client.GogglesReceiverScreen;
-import com.luna.jetoverlay.client.HudOverlay;
-import com.luna.jetoverlay.client.JetOverlayHud;
+import com.luna.jetoverlay.client.*;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -48,6 +45,17 @@ public class JetOverlayClient implements ClientModInitializer {
 		Minecraft.getInstance().setScreen(new DistanceSensorScreen(__block, __initialRange, __onlyPlayers));
 	}
 
+	private static void createBlockDetectorScreen(BlockPos __block, int __range, int __width) {
+		if (Minecraft.getInstance().level == null)
+			return;
+
+		BlockEntity ent = Minecraft.getInstance().level.getBlockEntity(__block);
+		if (!(ent instanceof CollisionDetectorEntity))
+			return;
+
+		Minecraft.getInstance().setScreen(new BlockDetectorScreen(__block, __range, __width));
+	}
+
 	@Override
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new JetOverlayHud());
@@ -63,5 +71,14 @@ public class JetOverlayClient implements ClientModInitializer {
 					boolean onlyPlayers = buf.readBoolean();
 					client.execute(() -> createDistanceSensorScreen(pos, range, onlyPlayers));
 				});
+
+		ClientPlayNetworking.registerGlobalReceiver(ModNetworking.OPEN_BLOCK_DETECTOR_PACKET_ID,
+				(client, handler, buf, responseSender) -> {
+					BlockPos pos = buf.readBlockPos();
+					int range = buf.readInt();
+					int width = buf.readInt();
+					client.execute(() -> createBlockDetectorScreen(pos, range, width));
+				});
+
 	}
 }
