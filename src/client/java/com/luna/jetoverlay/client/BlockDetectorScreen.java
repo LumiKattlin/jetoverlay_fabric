@@ -18,8 +18,8 @@ public class BlockDetectorScreen extends Screen {
 
 	int _range;
 	int _maxRange = 10;
-	int _width;
-	int _maxWidth = 4;
+	int _width = 0;
+	int _maxWidth = 5;
 	BlockPos _blockDetectorPos;
 
 	BlockDetectorSlider _rangeSlider = new BlockDetectorSlider(0, 0, 110, 20,
@@ -116,7 +116,13 @@ public class BlockDetectorScreen extends Screen {
 
 		@Override
 		protected void updateMessage() {
-			setMessage(Component.literal(_text + (getIntValue() + _minValue)));
+			if(_id == 0) {
+				setMessage(Component.literal(_text + (getIntValue() + _minValue)));
+			}
+			else {
+				setMessage(Component.literal(_text + (getIntValue() + 1)));
+			}
+			
 		}
 
 		@Override
