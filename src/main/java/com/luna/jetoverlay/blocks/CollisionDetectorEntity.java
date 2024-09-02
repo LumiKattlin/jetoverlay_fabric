@@ -15,7 +15,7 @@ import java.util.Objects;
 
 public class CollisionDetectorEntity extends BlockEntity {
 	public int _redstonePower = 0;
-	public int width = 0;
+	public int width;
 	public int range = 3;
 
 	public CollisionDetectorEntity(BlockPos pos, BlockState blockState) {
