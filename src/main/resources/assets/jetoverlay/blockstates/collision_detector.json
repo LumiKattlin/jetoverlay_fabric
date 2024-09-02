@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=east": { "model": "jetoverlay:block/collision_detector",
+      "y": 90
+    },
+    "facing=west": {"model": "jetoverlay:block/collision_detector",
+      "y": 270
+    },
+    "facing=south": {"model": "jetoverlay:block/collision_detector",
+      "y": 180
+    },
+    "facing=north": {"model": "jetoverlay:block/collision_detector"},
+    "facing=up": {"model": "jetoverlay:block/collision_detector",
+      "x": 90
+    },
+    "facing=down": {"model": "jetoverlay:block/collision_detector",
+      "x": 180
+    }
+  }
+}
