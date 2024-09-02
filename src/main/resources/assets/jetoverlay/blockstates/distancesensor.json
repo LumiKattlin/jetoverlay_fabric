@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "jetoverlay:block/distancesensor",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "jetoverlay:block/distancesensor",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "jetoverlay:block/distancesensor",
+      "y": 180
+    },
+    "facing=north": {
+      "model": "jetoverlay:block/distancesensor"
+    }
+  }
+}

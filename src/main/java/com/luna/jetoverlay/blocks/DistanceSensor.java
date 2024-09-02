@@ -9,6 +9,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -17,6 +18,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,6 +32,13 @@ public class DistanceSensor extends Block implements EntityBlock {
 
 	public DistanceSensor(Properties properties) {
 		super(properties);
+		registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH));
+	}
+
+	@Override
+	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		return Objects.requireNonNull(super.getStateForPlacement(ctx))
+				.setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection());
 	}
 
 	@Override
@@ -57,6 +67,12 @@ public class DistanceSensor extends Block implements EntityBlock {
 	@Override
 	public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new DistanceSensorEntity(pos, state);
+	}
+
+	@Override
+	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+		super.createBlockStateDefinition(builder);
+		builder.add(BlockStateProperties.HORIZONTAL_FACING);
 	}
 
 	@Override
