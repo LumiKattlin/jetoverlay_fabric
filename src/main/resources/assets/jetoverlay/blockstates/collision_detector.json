@@ -11,10 +11,10 @@
     },
     "facing=north": {"model": "jetoverlay:block/collision_detector"},
     "facing=up": {"model": "jetoverlay:block/collision_detector",
-      "x": 90
+      "x": 270
     },
     "facing=down": {"model": "jetoverlay:block/collision_detector",
-      "x": 180
+      "x": 90
     }
   }
 }

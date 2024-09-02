@@ -29,12 +29,12 @@ import java.util.Objects;
 public class CollisionDetector extends Block implements EntityBlock {
 	public CollisionDetector(Properties properties) {
 		super(properties);
-		registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH));
+		registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.SOUTH));
 	}
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext ctx) {
 		return Objects.requireNonNull(super.getStateForPlacement(ctx))
-				.setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
+				.setValue(BlockStateProperties.FACING, ctx.getNearestLookingDirection().getOpposite());
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class CollisionDetector extends Block implements EntityBlock {
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 		super.createBlockStateDefinition(builder);
-		builder.add(BlockStateProperties.HORIZONTAL_FACING);
+		builder.add(BlockStateProperties.FACING);
 	}
 
 	@Override

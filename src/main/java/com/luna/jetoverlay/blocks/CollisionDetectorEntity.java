@@ -45,7 +45,7 @@ public class CollisionDetectorEntity extends BlockEntity {
 		}
 
 		boolean blockDetected = false;
-		Direction direction = __blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+		Direction direction = __blockState.getValue(BlockStateProperties.FACING);
 
 		Pair<BlockPos, BlockPos> minMax = getDetectionMinMax(__blockPos, direction, collisionBlock.range, collisionBlock.width);
 
