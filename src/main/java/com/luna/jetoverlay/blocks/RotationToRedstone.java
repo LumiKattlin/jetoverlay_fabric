@@ -24,7 +24,7 @@ import java.util.Objects;
 public class RotationToRedstone extends Block implements EntityBlock {
 
     public RotationToRedstone(Properties properties) {
-        super(properties);
+        super(properties.noOcclusion());
     }
 
     //Runs every tick when the block is placed in the world
