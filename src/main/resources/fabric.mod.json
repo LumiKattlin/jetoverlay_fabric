@@ -1,9 +1,9 @@
 {
 	"schemaVersion": 1,
-	"id": "jetoverlay",
+	"id": "scandium",
 	"version": "${version}",
-	"name": "JetOverlay",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"name": "Scandium",
+	"description": "A mod about futurist tech that works with player data",
 	"authors": [
 		"Me!"
 	],

@@ -1,4 +1,6 @@
 {
   "item.jetoverlay.jet_goggles": "Fancy Cyberpunk Goggles",
-  "block.jetoverlay.redstoneoutputter": "Futuristic Cyberpunk Circuit"
+  "block.jetoverlay.redstoneoutputter": "Futuristic Cyberpunk Servo",
+  "block.jetoverlay.collision_detector": "Collision Detector",
+  "block.jetoverlay.distancesensor": "Distance Sensor"
 }
