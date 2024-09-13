@@ -22,7 +22,7 @@ import java.util.List;
 public class JetOverlayClient implements ClientModInitializer {
 	public static boolean renderOverlay = false;
 	public static List<LivingEntity> markedEntities = new ArrayList<>();
-	public static final KeyMapping toggle_outline = new KeyMapping("key.toggle-outline",
+	public static final KeyMapping TOGGLE_OUTLINE = new KeyMapping("key.toggle-outline",
 			InputConstants.Type.KEYSYM,
 			GLFW.GLFW_KEY_LEFT_CONTROL,
 			"jetoverlay"
@@ -60,7 +60,7 @@ public class JetOverlayClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		HudRenderCallback.EVENT.register(new JetOverlayHud());
 		HudRenderCallback.EVENT.register(new HudOverlay());
-		KeyBindingHelper.registerKeyBinding(toggle_outline);
+		KeyBindingHelper.registerKeyBinding(TOGGLE_OUTLINE);
 		KeyBindingHelper.registerKeyBinding(markEntityAsTarget);
 		MenuScreens.register(JetOverlay.GOGGLES_RECEIVER_SCREEN_HANDLER, GogglesReceiverScreen::new);
 
